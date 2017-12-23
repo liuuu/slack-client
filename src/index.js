@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import ApolloClient from 'apollo-client';
 import { HttpLink, InMemoryCache } from 'apollo-client-preset';
 import { ApolloProvider, graphql } from 'react-apollo';
+import 'semantic-ui-css/semantic.min.css';
 import gql from 'graphql-tag';
 import Routes from './routes';
 import registerServiceWorker from './registerServiceWorker';
