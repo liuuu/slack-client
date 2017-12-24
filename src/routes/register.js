@@ -42,14 +42,16 @@ class Register extends React.Component {
     console.log(response);
   };
 
-  onChange = e => {
+  onChange = (e) => {
     const { name, value } = e.target;
     // name = "email";
     this.setState({ [name]: value });
   };
 
   render() {
-    const { username, email, password, usernameError, emailError, passwordError } = this.state;
+    const {
+      username, email, password, usernameError, emailError, passwordError,
+    } = this.state;
 
     const errorList = [];
 
