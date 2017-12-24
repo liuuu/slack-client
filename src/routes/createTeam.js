@@ -25,16 +25,18 @@ class CreateTeam extends React.Component {
         variables: { name },
       });
     } catch (err) {
+      console.log('err', err);
+
       this.props.history.push('/login');
       return;
     }
 
-    console.log(response);
+    console.log('response', response);
 
-    const { ok, errors } = response.data.createTeam;
+    const { ok, errors, team } = response.data.createTeam;
 
     if (ok) {
-      this.props.history.push('/');
+      this.props.history.push(`/teams/${team.id}`);
     } else {
       const err = {};
       errors.forEach(({ path, message }) => {
@@ -80,6 +82,10 @@ const createTeamMutation = gql`
   mutation($name: String!) {
     createTeam(name: $name) {
       ok
+      team {
+        name
+        id
+      }
       errors {
         path
         message
