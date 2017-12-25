@@ -34,15 +34,21 @@ class Sidebar extends React.Component {
   };
 
   render() {
+    console.log('re-render');
     const { teams, team } = this.props;
     const { openInvitePeopleModal, openAddChannelModal } = this.state;
     let username = '';
+
+    let isOwner = false;
     try {
+      // get the user from token
       const token = localStorage.getItem('token');
+
       const { user } = decode(token);
       // eslint-disable-next-line prefer-destructuring
       username = user.username;
-      console.log('user', user);
+      // check if the login user is the owner of this team
+      isOwner = user.id === team.owner;
     } catch (err) {}
 
     return [
@@ -56,6 +62,7 @@ class Sidebar extends React.Component {
         onClick={this.handleAddChannelClick}
         users={[{ id: 1, name: 'nihaoa' }, { id: 2, name: 'hahah' }]}
         onInvitePeopleClick={this.handleInvitePeopleClick}
+        isOwner={isOwner}
       />,
       <AddChannelModal
         teamId={team.id}

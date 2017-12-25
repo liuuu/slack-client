@@ -36,6 +36,7 @@ class CreateTeam extends React.Component {
     const { ok, errors, team } = response.data.createTeam;
 
     if (ok) {
+      console.log('ok');
       this.props.history.push(`/teams/${team.id}`);
     } else {
       const err = {};
