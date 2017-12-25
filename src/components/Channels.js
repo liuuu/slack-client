@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Icon } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
 
 const ChannelWrapper = styled.div`
   grid-column: 2;
@@ -44,7 +45,11 @@ const Green = styled.span`
 
 const Bubble = ({ on = true }) => (on ? <Green>●</Green> : '○');
 
-const channel = ({ id, name }) => <SideBarListItem key={`channel-${id}`}># {name}</SideBarListItem>;
+const channel = ({ id, name }, teamId) => (
+  <Link key={`channel-${id}`} to={`/teams/${teamId}/${id}`}>
+    <SideBarListItem># {name}</SideBarListItem>
+  </Link>
+);
 
 const user = ({ id, name }) => (
   <SideBarListItem key={`user-${id}`}>
@@ -53,7 +58,7 @@ const user = ({ id, name }) => (
 );
 
 export default ({
-  teamName, username, channels, users, onClick,
+  teamName, username, channels, users, onClick, teamId, onInvitePeopleClick,
 }) => (
   <ChannelWrapper>
     <PushLeft>
@@ -65,7 +70,7 @@ export default ({
         <SideBarListHeader>
           Channels<Icon name="add circle" onClick={onClick} />
         </SideBarListHeader>
-        {channels.map(channel)}
+        {channels.map(ch => channel(ch, teamId))}
       </SideBarList>
     </div>
     <div>
@@ -73,6 +78,11 @@ export default ({
         <SideBarListHeader>Direct Messages</SideBarListHeader>
         {users.map(user)}
       </SideBarList>
+    </div>
+    <div>
+      <a href="#invite-people" onClick={onInvitePeopleClick}>
+        + Invite People
+      </a>
     </div>
   </ChannelWrapper>
 );
