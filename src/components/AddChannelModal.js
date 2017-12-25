@@ -3,6 +3,8 @@ import { Form, Input, Button, Modal } from 'semantic-ui-react';
 import { withFormik } from 'formik';
 import gql from 'graphql-tag';
 import { compose, graphql } from 'react-apollo';
+import _ from 'lodash';
+import { allTeamsQuery } from '../graphql/team';
 
 const AddChannelModal = ({
   open,
@@ -61,12 +63,25 @@ export default compose(
   withFormik({
     mapPropsToValues: () => ({ name: '' }),
     handleSubmit: async (values, { props: { onClose, teamId, mutate }, setSubmitting }) => {
-      console.log('typeof teamId', typeof parseInt(teamId, 10));
-
-      const response = await mutate({
+      await mutate({
         variables: { teamId, name: values.name },
+        update: (store, { data: { createChannel } }) => {
+          // this mutation back from `data`
+          const { ok, channel } = createChannel;
+          if (!ok) {
+            return;
+          }
+          // Read the data from our cache for this query.
+          const data = store.readQuery({ query: allTeamsQuery });
+          // Add our comment from the mutation to the end.
+
+          const teamIdx = _.findIndex(data.allTeams, ['id', teamId]);
+
+          data.allTeams[teamIdx].channels.push(channel);
+          // Write our data back to the cache.
+          store.writeQuery({ query: allTeamsQuery, data });
+        },
       });
-      console.log('response', response);
 
       onClose();
       setSubmitting(false);
