@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { HttpLink } from 'apollo-link-http';
-import { ApolloLink, concat } from 'apollo-link';
+import { ApolloLink, concat, split } from 'apollo-link';
 import { setContext } from 'apollo-link-context';
 import { onError } from 'apollo-link-error';
 import ApolloClient from 'apollo-client';
@@ -10,6 +10,10 @@ import { InMemoryCache } from 'apollo-client-preset';
 import { ApolloProvider } from 'react-apollo';
 import 'semantic-ui-css/semantic.min.css';
 import gql from 'graphql-tag';
+
+import { WebSocketLink } from 'apollo-link-ws';
+import { getMainDefinition } from 'apollo-utilities';
+
 import Routes from './routes';
 import registerServiceWorker from './registerServiceWorker';
 
@@ -57,15 +61,36 @@ const afterwareLink = new ApolloLink((operation, forward) =>
 
 const httpLinkWithMiddleware = afterwareLink.concat(middlewareLink.concat(httpLink));
 
-const client = new ApolloClient({
-  link: httpLinkWithMiddleware,
-  cache: new InMemoryCache(),
-});
+// const client = new ApolloClient({
+//   link: httpLinkWithMiddleware,
+//   cache: new InMemoryCache(),
+// });
 
 // const client = new ApolloClient({
 //   link: new HttpLink({ uri: 'http://localhost:8888/graphql' }),
 //   cache: new InMemoryCache(),
 // });
+
+const wsLink = new WebSocketLink({
+  uri: 'ws://localhost:8888/subscriptions',
+  options: {
+    reconnect: true,
+  },
+});
+
+const link = split(
+  ({ query }) => {
+    const { kind, operation } = getMainDefinition(query);
+    return kind === 'OperationDefinition' && operation === 'subscription';
+  },
+  wsLink,
+  httpLinkWithMiddleware,
+);
+
+const client = new ApolloClient({
+  link,
+  cache: new InMemoryCache(),
+});
 
 ReactDOM.render(
   <ApolloProvider client={client}>
