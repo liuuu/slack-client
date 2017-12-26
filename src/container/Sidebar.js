@@ -11,10 +11,13 @@ import AddChannelModal from '../components/AddChannelModal';
 import { meQuery } from '../graphql/team';
 import InvitePeopleModal from '../components/InvitePeopleModal';
 
+import DirectMessageModal from '../components/DirectMessageModal';
+
 class Sidebar extends React.Component {
   state = {
     openAddChannelModal: false,
     openInvitePeopleModal: false,
+    openDirectMessgaeModal: false,
   };
 
   handleCloseAddChannelModal = () => {
@@ -33,10 +36,20 @@ class Sidebar extends React.Component {
     this.setState({ openInvitePeopleModal: false });
   };
 
+  handleDirectMessageClick = () => {
+    console.log('sdfasdfasdfadf');
+
+    this.setState({ openDirectMessgaeModal: true });
+  };
+
+  handleCloseDirectMessageModal = () => {
+    this.setState({ openDirectMessgaeModal: false });
+  };
+
   render() {
     console.log('re-render');
     const { teams, team, username } = this.props;
-    const { openInvitePeopleModal, openAddChannelModal } = this.state;
+    const { openInvitePeopleModal, openAddChannelModal, openDirectMessgaeModal } = this.state;
     console.log('team.admin', team.admin);
 
     return [
@@ -51,12 +64,19 @@ class Sidebar extends React.Component {
         users={[{ id: 1, name: 'nihaoa' }, { id: 2, name: 'hahah' }]}
         onInvitePeopleClick={this.handleInvitePeopleClick}
         isOwner={team.admin}
+        onDirectMessageClick={this.handleDirectMessageClick}
       />,
       <AddChannelModal
         teamId={team.id}
         onClose={this.handleCloseAddChannelModal}
         open={openAddChannelModal}
         key="sidebar-add-channel-modal"
+      />,
+      <DirectMessageModal
+        teamId={team.id}
+        onClose={this.handleCloseDirectMessageModal}
+        open={openDirectMessgaeModal}
+        key="sidebar-direct-message-modal"
       />,
       <InvitePeopleModal
         teamId={team.id}
