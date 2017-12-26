@@ -8,7 +8,7 @@ import decode from 'jwt-decode';
 import Channels from '../components/Channels';
 import Teams from '../components/Teams';
 import AddChannelModal from '../components/AddChannelModal';
-import { allTeamsQuery } from '../graphql/team';
+import { meQuery } from '../graphql/team';
 import InvitePeopleModal from '../components/InvitePeopleModal';
 
 class Sidebar extends React.Component {
@@ -35,21 +35,9 @@ class Sidebar extends React.Component {
 
   render() {
     console.log('re-render');
-    const { teams, team } = this.props;
+    const { teams, team, username } = this.props;
     const { openInvitePeopleModal, openAddChannelModal } = this.state;
-    let username = '';
-
-    let isOwner = false;
-    try {
-      // get the user from token
-      const token = localStorage.getItem('token');
-
-      const { user } = decode(token);
-      // eslint-disable-next-line prefer-destructuring
-      username = user.username;
-      // check if the login user is the owner of this team
-      isOwner = user.id === team.owner;
-    } catch (err) {}
+    console.log('team.admin', team.admin);
 
     return [
       <Teams key="team-sidebar" teams={teams} />,
@@ -62,7 +50,7 @@ class Sidebar extends React.Component {
         onClick={this.handleAddChannelClick}
         users={[{ id: 1, name: 'nihaoa' }, { id: 2, name: 'hahah' }]}
         onInvitePeopleClick={this.handleInvitePeopleClick}
-        isOwner={isOwner}
+        isOwner={team.admin}
       />,
       <AddChannelModal
         teamId={team.id}
@@ -80,4 +68,4 @@ class Sidebar extends React.Component {
   }
 }
 
-export default graphql(allTeamsQuery)(Sidebar);
+export default graphql(meQuery)(Sidebar);

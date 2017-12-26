@@ -4,22 +4,23 @@ import findIndex from 'lodash/findIndex';
 import { Redirect } from 'react-router-dom';
 
 import Header from '../components/Header';
-import Messages from '../components/Messages';
 import SendMessage from '../components/SendMessage';
 import AppLayout from '../components/appLayout';
 import Sidebar from '../container/Sidebar';
-import { allTeamsQuery } from '../graphql/team';
 import MessageContainer from '../container/MessageContainer';
+import { meQuery } from '../graphql/team';
 
 const ViewTeam = ({
-  data: { loading, allTeams, inviteTeams },
+  data: { loading, me, ...otherProps },
   match: { params: { teamId, channelId } },
 }) => {
   if (loading) {
     return null;
   }
 
-  const teams = [...allTeams, ...inviteTeams];
+  console.log('me', me);
+
+  const { teams, username } = me;
 
   if (!teams.length) {
     return <Redirect to="/create-team" />;
@@ -41,6 +42,7 @@ const ViewTeam = ({
           letter: t.name.charAt(0).toUpperCase(),
         }))}
         team={team}
+        username={username}
       />
       {channel && <Header channelName={channel.name} />}
       {channel && <MessageContainer channelId={channel.id} />}
@@ -49,4 +51,4 @@ const ViewTeam = ({
   );
 };
 
-export default graphql(allTeamsQuery)(ViewTeam);
+export default graphql(meQuery, { options: { fetchPolicy: 'network-only' } })(ViewTeam);
