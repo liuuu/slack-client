@@ -5,8 +5,58 @@ import { Comment } from 'semantic-ui-react';
 
 import Messages from '../components/Messages';
 
-// eslint-disable-next-line
+const newDirectMessageSubscription = gql`
+  subscription($teamId: Int!, $userId: Int!) {
+    newDirectMessage(teamId: $teamId, userId: $userId) {
+      id
+      sender {
+        username
+      }
+      text
+      created_at
+    }
+  }
+`;
+
 class DirectMessageContainer extends React.Component {
+  componentWillMount() {
+    this.unsubscribe = this.subscribe(this.props.teamId, this.props.userId);
+  }
+
+  componentWillReceiveProps({ teamId, userId }) {
+    if (this.props.teamId !== teamId || this.props.userId !== userId) {
+      if (this.unsubscribe) {
+        this.unsubscribe();
+      }
+      this.unsubscribe = this.subscribe(teamId, userId);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+  }
+
+  subscribe = (teamId, userId) =>
+    this.props.data.subscribeToMore({
+      document: newDirectMessageSubscription,
+      variables: {
+        teamId,
+        userId,
+      },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          directMessages: [...prev.directMessages, subscriptionData.data.newDirectMessage],
+        };
+      },
+    });
+
   render() {
     const { data: { loading, directMessages } } = this.props;
 
@@ -47,11 +97,11 @@ const directMessagesQuery = gql`
 `;
 
 export default graphql(directMessagesQuery, {
-  variables: props => ({
-    teamId: props.teamId,
-    userId: props.userId,
-  }),
-  options: {
+  options: props => ({
     fetchPolicy: 'network-only',
-  },
+    variables: {
+      teamId: props.teamId,
+      userId: props.userId,
+    },
+  }),
 })(DirectMessageContainer);
