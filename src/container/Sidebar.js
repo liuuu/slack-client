@@ -12,6 +12,7 @@ import { meQuery } from '../graphql/team';
 import InvitePeopleModal from '../components/InvitePeopleModal';
 
 import DirectMessageModal from '../components/DirectMessageModal';
+import directMessage from '../routes/directMessage';
 
 class Sidebar extends React.Component {
   state = {
@@ -48,7 +49,10 @@ class Sidebar extends React.Component {
 
   render() {
     console.log('re-render');
-    const { teams, team, username } = this.props;
+    const {
+      teams, team, username, directMessageMembers,
+    } = this.props;
+
     const { openInvitePeopleModal, openAddChannelModal, openDirectMessgaeModal } = this.state;
     console.log('team.admin', team.admin);
 
@@ -61,7 +65,7 @@ class Sidebar extends React.Component {
         teamId={team.id}
         channels={team.channels}
         onClick={this.handleAddChannelClick}
-        users={[{ id: 1, name: 'nihaoa' }, { id: 2, name: 'hahah' }]}
+        users={directMessageMembers}
         onInvitePeopleClick={this.handleInvitePeopleClick}
         isOwner={team.admin}
         onDirectMessageClick={this.handleDirectMessageClick}

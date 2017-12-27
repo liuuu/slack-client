@@ -25,6 +25,7 @@ const ViewTeam = ({ mutate, data: { loading, me }, match: { params: { teamId, ch
   const teamIdInteger = parseInt(teamId, 10);
   const teamIdx = teamIdInteger ? findIndex(teams, ['id', teamIdInteger]) : 0;
   const team = teamIdx === -1 ? teams[0] : teams[teamIdx];
+  console.log('team', team);
 
   const channelIdInteger = parseInt(channelId, 10);
   const channelIdx = channelIdInteger ? findIndex(team.channels, ['id', channelIdInteger]) : 0;
@@ -39,6 +40,7 @@ const ViewTeam = ({ mutate, data: { loading, me }, match: { params: { teamId, ch
         }))}
         team={team}
         username={username}
+        directMessageMembers={team.directMessageMembers}
       />
       {channel && <Header channelName={channel.name} />}
       {channel && <MessageContainer channelId={channel.id} />}
