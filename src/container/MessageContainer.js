@@ -1,7 +1,7 @@
 import React from 'react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { Comment } from 'semantic-ui-react';
+import { Comment, Button } from 'semantic-ui-react';
 
 import Messages from '../components/Messages';
 
@@ -71,6 +71,30 @@ class MessageContainer extends React.Component {
     return loading ? null : (
       <Messages>
         <Comment.Group>
+          <Button
+            onClick={() => {
+              const offset = this.props.data.messages.length;
+              console.log('offset', offset);
+
+              this.props.data.fetchMore({
+                variables: {
+                  channelId: this.props.channelId,
+                  offset: this.props.data.messages.length,
+                },
+                updateQuery: (previousResult, { fetchMoreResult }) => {
+                  if (!fetchMoreResult) {
+                    return previousResult;
+                  }
+                  return {
+                    ...previousResult,
+                    messages: [...previousResult.messages, ...fetchMoreResult.messages],
+                  };
+                },
+              });
+            }}
+          >
+            Load More
+          </Button>
           {messages.map(m => (
             <Comment key={`${m.id}-message`}>
               <Comment.Content>
@@ -92,8 +116,8 @@ class MessageContainer extends React.Component {
 }
 
 const messagesQuery = gql`
-  query($channelId: Int!) {
-    messages(channelId: $channelId) {
+  query($channelId: Int!, $offset: Int!) {
+    messages(channelId: $channelId, offset: $offset) {
       id
       text
       user {
@@ -105,10 +129,11 @@ const messagesQuery = gql`
 `;
 
 export default graphql(messagesQuery, {
-  variables: props => ({
-    channelId: props.channelId,
-  }),
-  options: {
+  options: props => ({
+    variables: {
+      channelId: props.channelId,
+      offset: 0,
+    },
     fetchPolicy: 'network-only',
-  },
+  }),
 })(MessageContainer);
