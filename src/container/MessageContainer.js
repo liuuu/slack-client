@@ -29,12 +29,28 @@ class MessageContainer extends React.Component {
     this.unsubscribe = this.subscribe(this.props.channelId);
   }
 
-  componentWillReceiveProps({ channelId }) {
+  componentWillReceiveProps({ channelId, data: { messages } }) {
     if (this.props.channelId !== channelId) {
       if (this.unsubscribe) {
         this.unsubscribe();
       }
       this.unsubscribe = this.subscribe(channelId);
+    }
+
+    if (
+      this.sl &&
+      this.sl.scrollTop < 100 &&
+      this.props.data.messages &&
+      messages &&
+      this.props.data.messages.length !== messages.length
+    ) {
+      // preserve height before re-render
+      const heightBeforeRender = this.sl.scrollHeight;
+
+      setTimeout(() => {
+        // set the position of bar after re-render
+        this.sl.scrollTop = this.sl.scrollHeight - heightBeforeRender;
+      }, 120);
     }
   }
 
@@ -51,7 +67,6 @@ class MessageContainer extends React.Component {
         channelId,
       },
       updateQuery: (prev, { subscriptionData }) => {
-        console.log('dfsdf');
         console.log('prev', prev);
         console.log('subscriptionData', subscriptionData.data.newChannelMessage);
 
@@ -61,41 +76,81 @@ class MessageContainer extends React.Component {
 
         return {
           ...prev,
-          messages: [...prev.messages, subscriptionData.data.newChannelMessage],
+          messages: [subscriptionData.data.newChannelMessage, ...prev.messages],
         };
       },
     });
 
+  handleScroll = () => {
+    const tillTop = this.sl.scrollTop;
+
+    if (tillTop === 0) {
+      //
+      const offset = this.props.data.messages.length;
+      console.log('offset', offset);
+
+      this.props.data.fetchMore({
+        variables: {
+          channelId: this.props.channelId,
+          offset: this.props.data.messages.length,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult) {
+            return previousResult;
+          }
+          return {
+            ...previousResult,
+            messages: [...previousResult.messages, ...fetchMoreResult.messages],
+          };
+        },
+      });
+    }
+  };
+
   render() {
     const { data: { loading, messages } } = this.props;
     return loading ? null : (
-      <Messages>
+      <div
+        onScroll={this.handleScroll}
+        ref={(sl) => {
+          this.sl = sl;
+        }}
+        style={{
+          gridColumn: 3,
+          gridRow: 2,
+          paddingLeft: ' 20px',
+          paddingRight: '20px',
+          display: 'flex',
+          flexDirection: 'column-reverse',
+          overflowY: 'auto',
+        }}
+      >
         <Comment.Group>
-          <Button
-            onClick={() => {
-              const offset = this.props.data.messages.length;
-              console.log('offset', offset);
+          {/* <Button
+              onClick={() => {
+                const offset = this.props.data.messages.length;
+                console.log('offset', offset);
 
-              this.props.data.fetchMore({
-                variables: {
-                  channelId: this.props.channelId,
-                  offset: this.props.data.messages.length,
-                },
-                updateQuery: (previousResult, { fetchMoreResult }) => {
-                  if (!fetchMoreResult) {
-                    return previousResult;
-                  }
-                  return {
-                    ...previousResult,
-                    messages: [...previousResult.messages, ...fetchMoreResult.messages],
-                  };
-                },
-              });
-            }}
-          >
-            Load More
-          </Button>
-          {messages.map(m => (
+                this.props.data.fetchMore({
+                  variables: {
+                    channelId: this.props.channelId,
+                    offset: this.props.data.messages.length,
+                  },
+                  updateQuery: (previousResult, { fetchMoreResult }) => {
+                    if (!fetchMoreResult) {
+                      return previousResult;
+                    }
+                    return {
+                      ...previousResult,
+                      messages: [...previousResult.messages, ...fetchMoreResult.messages],
+                    };
+                  },
+                });
+              }}
+            >
+              Load More
+            </Button> */}
+          {[...messages].reverse().map(m => (
             <Comment key={`${m.id}-message`}>
               <Comment.Content>
                 <Comment.Author as="a">{m.user.username}</Comment.Author>
@@ -110,7 +165,7 @@ class MessageContainer extends React.Component {
             </Comment>
           ))}
         </Comment.Group>
-      </Messages>
+      </div>
     );
   }
 }
