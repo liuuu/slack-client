@@ -33,8 +33,9 @@ class Login extends React.Component {
       localStorage.setItem('token', token);
       localStorage.setItem('refreshToken', refreshToken);
       // fixed the ws connection
-      // wsLink.subscriptionClient.tryReconnect();
-      window.location.href = '/teams';
+      wsLink.subscriptionClient.tryReconnect();
+      // window.location.href = '/teams';
+      this.props.history.push('/teams');
     } else {
       const err = {};
       errors.forEach(({ path, message }) => {

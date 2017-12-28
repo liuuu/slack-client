@@ -1,13 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Input } from 'semantic-ui-react';
+import { Input, Button, Icon } from 'semantic-ui-react';
 import { withFormik } from 'formik';
 import gql from 'graphql-tag';
 import { compose, graphql } from 'react-apollo';
+import FileUpload from './FileUpload';
 
 const SendMessageWrapper = styled.div`
   grid-column: 3;
   padding: 20px;
+  display: grid;
 `;
 
 const ENTER_KEY = 13;

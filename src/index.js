@@ -13,13 +13,15 @@ import gql from 'graphql-tag';
 
 import { WebSocketLink } from 'apollo-link-ws';
 import { getMainDefinition } from 'apollo-utilities';
+import createFileLink from './createFileLink';
 
 import Routes from './routes';
 import registerServiceWorker from './registerServiceWorker';
 
 const App = Routes;
 
-const httpLink = new HttpLink({ uri: 'http://localhost:8888/graphql' });
+// const httpLink = new HttpLink({ uri: 'http://localhost:8888/graphql' });
+const httpLink = createFileLink({ uri: 'http://localhost:8888/graphql' });
 
 // const middlewareLink = new ApolloLink((operation, forward) => {
 //   // add the authorization to the headers
