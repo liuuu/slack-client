@@ -71,14 +71,18 @@ const httpLinkWithMiddleware = afterwareLink.concat(middlewareLink.concat(httpLi
 //   cache: new InMemoryCache(),
 // });
 
-const wsLink = new WebSocketLink({
+// eslint-disable-next-line
+export const wsLink = new WebSocketLink({
   uri: 'ws://localhost:8888/subscriptions',
   options: {
     reconnect: true,
-    // auth token
+    lazy: true,
     connectionParams: {
-      token: localStorage.getItem('token'),
-      refreshToken: localStorage.getItem('refreshToken'),
+      token:
+        console.log('ws token', localStorage.getItem('token')) || localStorage.getItem('token'),
+      refreshToken:
+        console.log('ws token', localStorage.getItem('token')) ||
+        localStorage.getItem('refreshToken'),
     },
   },
 });

@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { Button, Input, Container, Header, Message, Form } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import { wsLink } from '../index';
 
 class Login extends React.Component {
   constructor(props) {
@@ -31,7 +32,9 @@ class Login extends React.Component {
     if (ok) {
       localStorage.setItem('token', token);
       localStorage.setItem('refreshToken', refreshToken);
-      this.props.history.push('/');
+      // fixed the ws connection
+      // wsLink.subscriptionClient.tryReconnect();
+      window.location.href = '/teams';
     } else {
       const err = {};
       errors.forEach(({ path, message }) => {
