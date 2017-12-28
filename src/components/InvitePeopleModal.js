@@ -82,7 +82,6 @@ export default compose(
         setSubmitting(false);
       } else {
         console.log('errors', errors);
-
         setSubmitting(false);
         setErrors(handleErr(errors));
       }
