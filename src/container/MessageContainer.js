@@ -47,12 +47,24 @@ class MessageContainer extends React.Component {
       // preserve height before re-render
       const heightBeforeRender = this.sl.scrollHeight;
 
+      // this.heightBeforeRender = this.sl.scrollHeight;
       setTimeout(() => {
         // set the position of bar after re-render
         this.sl.scrollTop = this.sl.scrollHeight - heightBeforeRender;
-      }, 120);
+      }, 200);
     }
   }
+
+  // componentDidUpdate({ channelId }) {
+  //   if (
+  //     this.sl &&
+  //     this.sl.scrollHeight !== this.heightBeforeRender &&
+  //     this.heightBeforeRender &&
+  //     this.props.channelId === channelId
+  //   ) {
+  //     this.sl.scrollTop = this.sl.scrollHeight - this.heightBeforeRender;
+  //   }
+  // }
 
   componentWillUnmount() {
     if (this.unsubscribe) {
